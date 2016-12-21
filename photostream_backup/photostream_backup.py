@@ -2,7 +2,7 @@ import os
 import records
 
 home_dir = os.path.expanduser('~')
-photo_stream_dir = home_dir+"/Library/Containers/com.apple.cloudphotosd/Data/Library/Application Support/" \
+base_photo_stream_dir = home_dir+"/Library/Containers/com.apple.cloudphotosd/Data/Library/Application Support/" \
                             "com.apple.cloudphotosd/services/com.apple.photo.icloud.sharedstreams"
 
 def initialize(destination, streams = None, verbose = False):
@@ -38,7 +38,7 @@ def get_sqllite_db_path(photostream_dir):
     :param photostream_dir:
     :return: sqllite file path
     """
-    share_dir = photo_stream_dir + "/coremediastream-state/"
+    share_dir = photostream_dir + "/coremediastream-state/"
     # now look for the directory in the share dir, and grab the first one
     # based on this answer:
     # http://stackoverflow.com/questions/973473/getting-a-list-of-all-subdirectories-in-the-current-directory
@@ -48,16 +48,24 @@ def get_sqllite_db_path(photostream_dir):
     return sqlite_path
 
 def get_ps_img_uuids(stream_name, photostream_dir):
-    sqlite_path = get_sqllite_db_path(photo_stream_dir)
+    sqlite_path = get_sqllite_db_path(photostream_dir)
     db = records.Database('sqlite+pysqlite:///'+sqlite_path)
 
-    sql = "SELECT ac.GUID AS 'uuid', ac.photoDate AS 'date' " \
-          "FROM AssetCollections AS ac" \
-          "JOIN Albums AS a ON a.GUID = ac.albumGUID" \
-          "WHERE a.name = " + stream_name + ";"
+    sql = "SELECT ac.GUID AS 'uuid', ac.photoDate AS 'date' FROM AssetCollections AS ac JOIN Albums AS a ON a.GUID = ac.albumGUID WHERE a.name = '" + stream_name + "';"
     rows = db.query(sql)
+    print(rows.as_dict())
 
+def get_ps_album_uuids(stream_name, photostream_dir):
+    sqlite_path = get_sqllite_db_path(photostream_dir)
+    db = records.Database('sqlite+pysqlite:///'+sqlite_path)
+    sql = "SELECT a.GUID AS 'uuid' FROM Albums AS a WHERE a.name = '" + stream_name + "';"
+    rows = db.query(sql)
+    print ('albums')
+    print(rows.as_dict())
 
 #initialize(destination=photo_stream_dir)
 
-get_sqllite_db_path(photo_stream_dir)
+#get_sqllite_db_path(photo_stream_dir)
+
+get_ps_img_uuids("Sylvia", base_photo_stream_dir)
+get_ps_album_uuids("Sylvia", base_photo_stream_dir)
