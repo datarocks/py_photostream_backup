@@ -51,14 +51,15 @@ def get_ps_img_uuids(stream_name, photostream_dir):
     sqlite_path = get_sqllite_db_path(photostream_dir)
     db = records.Database('sqlite+pysqlite:///'+sqlite_path)
 
-    sql = "SELECT ac.GUID AS 'uuid', ac.photoDate AS 'date' FROM AssetCollections AS ac JOIN Albums AS a ON a.GUID = ac.albumGUID WHERE a.name = '" + stream_name + "';"
+    sql = "SELECT ac.GUID AS 'uuid', ac.photoDate AS 'date' FROM AssetCollections AS ac JOIN Albums AS a ON a.GUID = " \
+          "ac.albumGUID WHERE a.name = '%s';" % stream_name
     rows = db.query(sql)
     print(rows.as_dict())
 
 def get_ps_album_uuids(stream_name, photostream_dir):
     sqlite_path = get_sqllite_db_path(photostream_dir)
     db = records.Database('sqlite+pysqlite:///'+sqlite_path)
-    sql = "SELECT a.GUID AS 'uuid' FROM Albums AS a WHERE a.name = '" + stream_name + "';"
+    sql = "SELECT a.GUID AS 'uuid' FROM Albums AS a WHERE a.name = '%s';" % stream_name
     rows = db.query(sql)
     print ('albums')
     print(rows.as_dict())
